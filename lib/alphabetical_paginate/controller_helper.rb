@@ -4,12 +4,18 @@ module AlphabeticalPaginate
       base.extend(self)
     end
 
-    def alpha_paginate current_field, params = {:enumerate => false, :default_field => "a",
-                                                :paginate_all => false, :numbers => true,
-                                                :others => true, :pagination_class => "pagination-centered",
-                                                :batch_size => 500, :db_mode => false,
-                                                :db_field => "id", :include_all => true,
-                                                :js => true, :support_language => :en}
+    def alpha_paginate(current_field, params = {:enumerate => false,
+                                                :default_field => 'a',
+                                                :paginate_all => false,
+                                                :numbers => true,
+                                                :others => true,
+                                                :pagination_class => 'pagination-centered',
+                                                :batch_size => 500,
+                                                :db_mode => false,
+                                                :db_field => 'id',
+                                                :include_all => true,
+                                                :js => true,
+                                                :support_language => :en})
       params[:paginate_all] ||= false
       params[:support_language] ||= :en
       params[:language] = AlphabeticalPaginate::Language.new(params[:support_language])
@@ -17,11 +23,11 @@ module AlphabeticalPaginate
       params[:numbers] = true if !params.has_key? :numbers
       params[:others] = true if !params.has_key? :others
       params[:js] = true if !params.has_key? :js
-      params[:pagination_class] ||= "pagination-centered"
+      params[:pagination_class] ||= 'pagination-centered'
       params[:batch_size] ||= 500
-      params[:default_field] ||= params[:include_all] ? "all" : params[:language].default_letter
+      params[:default_field] ||= params[:include_all] ? 'all' : params[:language].default_letter
       params[:db_mode] ||= false
-      params[:db_field] ||= "id"
+      params[:db_field] ||= 'id'
 
       output = []
 
@@ -29,12 +35,10 @@ module AlphabeticalPaginate
         current_field = params[:default_field]
       end
       current_field = current_field.mb_chars.downcase.to_s
-      all = params[:include_all] && current_field == "all"
+      all = params[:include_all] && current_field == 'all'
 
       if params[:db_mode]
-        if !ActiveRecord::Base.connection.adapter_name.downcase.include? "mysql"
-          raise "You need a mysql database to use db_mode with alphabetical_paginate"
-        end
+        raise 'You need a mysql database to use db_mode with alphabetical_paginate' if !ActiveRecord::Base.connection.adapter_name.downcase.include? 'mysql'
         params[:paginate_all] = true
         params[:availableLetters] = []
 
@@ -42,16 +46,16 @@ module AlphabeticalPaginate
           output = self
         else
           case current_field
-          when params[:language].letters_regexp
-            output = self.where("LOWER(%s) REGEXP '^%s.*'" % [params[:db_field], current_field])
-          when /[0-9]/
-            if params[:enumerate]
+            when params[:language].letters_regexp
               output = self.where("LOWER(%s) REGEXP '^%s.*'" % [params[:db_field], current_field])
+            when /[0-9]/
+              if params[:enumerate]
+                output = self.where("LOWER(%s) REGEXP '^%s.*'" % [params[:db_field], current_field])
+              else
+                output = self.where("LOWER(%s) REGEXP '^[0-9].*'" % [params[:db_field], current_field])
+              end
             else
-              output = self.where("LOWER(%s) REGEXP '^[0-9].*'" % [params[:db_field], current_field])
-            end
-          else
-            output = self.where("LOWER(%s) REGEXP '^[^a-z0-9].*'" % [params[:db_field], current_field])
+              output = self.where("LOWER(%s) REGEXP '^[^a-z0-9].*'" % [params[:db_field], current_field])
           end
         end
         #output.sort! {|x, y| x.send(params[:db_field]) <=> y.send(params[:db_field])}
@@ -68,18 +72,18 @@ module AlphabeticalPaginate
             when /[0-9]/
               if params[:enumerate]
                 availableLetters[field_letter] = true if !availableLetters.has_key? field_letter
-                output << x if all || (current_field =~ /[0-9]/ && field_letter == current_field) 
+                output << x if all || (current_field =~ /[0-9]/ && field_letter == current_field)
               else
                 availableLetters['0-9'] = true if !availableLetters.has_key? 'numbers'
-                output << x if all || current_field == "0-9"
+                output << x if all || current_field == '0-9'
               end
             else
               availableLetters['*'] = true if !availableLetters.has_key? 'other'
-              output << x if all || current_field == "*"
+              output << x if all || current_field == '*'
           end
         end
-        params[:availableLetters] = availableLetters.collect{ |k,v| k.mb_chars.capitalize.to_s }
-        output.sort! {|x, y| block_given? ? (yield(x).to_s <=> yield(y).to_s) : (x.id.to_s <=> y.id.to_s) }
+        params[:availableLetters] = availableLetters.collect { |k, _| k.mb_chars.capitalize.to_s }
+        output.sort! { |x, y| block_given? ? (yield(x).to_s <=> yield(y).to_s) : (x.id.to_s <=> y.id.to_s) }
       end
       params[:currentField] = current_field.mb_chars.capitalize.to_s
       return output, params
