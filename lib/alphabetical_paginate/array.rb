@@ -1,9 +1,9 @@
 # coding: utf-8
 class Array
-  def alpha_paginate current_field, params = {enumerate:false, default_field: "a", 
-                                              paginate_all: false, numbers: true, include_all: true,
-                                              others: true, pagination_class: "pagination-centered",
-                                              js: true, support_language: :en}
+  def alpha_paginate current_field, params = {:enumerate =>  false, :default_field =>  "a",
+                                              :paginate_all =>  false, :numbers =>  true, :include_all =>  true,
+                                              :others =>  true, :pagination_class =>  "pagination-centered",
+                                              :js =>  true, :support_language => :en}
     params[:paginate_all] ||= false
     params[:support_language] ||= :en
     params[:language] = AlphabeticalPaginate::Language.new(params[:support_language])

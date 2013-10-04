@@ -41,7 +41,7 @@ It has a :db_mode parameter which tells the gem to perform low level SQL queries
 class UsersController < ApplicationController
 
   def index
-    @users, @alphaParams = User.alpha_paginate(params[:letter], {db_mode: true, db_field: "name"})
+    @users, @alphaParams = User.alpha_paginate(params[:letter], {:db_mode => true, :db_field => "name"})
   end
   
   ...

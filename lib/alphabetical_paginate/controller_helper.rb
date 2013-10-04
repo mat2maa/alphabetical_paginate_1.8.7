@@ -4,12 +4,12 @@ module AlphabeticalPaginate
       base.extend(self)
     end
 
-    def alpha_paginate current_field, params = {enumerate:false, default_field: "a", 
-                                                paginate_all: false, numbers: true,
-                                                others: true, pagination_class: "pagination-centered",
-                                                batch_size: 500, db_mode: false, 
-                                                db_field: "id", include_all: true,
-                                                js: true, support_language: :en}
+    def alpha_paginate current_field, params = {:enumerate => false, :default_field => "a",
+                                                :paginate_all => false, :numbers => true,
+                                                :others => true, :pagination_class => "pagination-centered",
+                                                :batch_size => 500, :db_mode => false,
+                                                :db_field => "id", :include_all => true,
+                                                :js => true, :support_language => :en}
       params[:paginate_all] ||= false
       params[:support_language] ||= :en
       params[:language] = AlphabeticalPaginate::Language.new(params[:support_language])
@@ -58,7 +58,7 @@ module AlphabeticalPaginate
         output.order("#{params[:db_field]} ASC")
       else
         availableLetters = {}
-        self.find_each({batch_size: params[:batch_size]}) do |x|
+        self.find_each({:batch_size => params[:batch_size]}) do |x|
           field_val = block_given? ? yield(x).to_s : x.id.to_s
           field_letter = field_val[0].mb_chars.downcase.to_s
           case field_letter
